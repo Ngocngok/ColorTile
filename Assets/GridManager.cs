@@ -10,6 +10,14 @@ public class GridManager : MonoBehaviour
     public float tileSize = 1f;
     public GameObject tilePrefab;
 
+    [Header("Camera Settings")]
+    [Tooltip("Camera X rotation angle (0 = horizontal, 90 = top-down)")]
+    public float cameraAngle = 60f;
+    [Tooltip("Distance multiplier for camera positioning")]
+    public float cameraDistanceMultiplier = 1.5f;
+    [Tooltip("Additional height offset for camera")]
+    public float cameraHeightOffset = 5f;
+
     private Tile[,] grid;
 
     void Awake()
@@ -68,8 +76,25 @@ public class GridManager : MonoBehaviour
         Camera mainCamera = Camera.main;
         if (mainCamera != null)
         {
-            mainCamera.transform.position = new Vector3(centerX, 25f, centerZ);
-            mainCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            // Switch to perspective camera
+            mainCamera.orthographic = false;
+            mainCamera.fieldOfView = 60f; // Standard FOV
+            
+            // Calculate camera distance based on map size
+            float mapDiagonal = Mathf.Sqrt(gridWidth * gridWidth + gridHeight * gridHeight) * tileSize;
+            float cameraDistance = mapDiagonal * cameraDistanceMultiplier;
+            
+            // Calculate camera position based on angle
+            float angleInRadians = cameraAngle * Mathf.Deg2Rad;
+            float height = Mathf.Sin(angleInRadians) * cameraDistance + cameraHeightOffset;
+            float horizontalDistance = Mathf.Cos(angleInRadians) * cameraDistance;
+            
+            // Position camera behind and above the center
+            Vector3 cameraPosition = new Vector3(centerX, height, centerZ - horizontalDistance);
+            mainCamera.transform.position = cameraPosition;
+            
+            // Look at the center of the grid
+            mainCamera.transform.LookAt(new Vector3(centerX, 0, centerZ));
         }
     }
 

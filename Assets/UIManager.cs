@@ -152,6 +152,19 @@ public class UIManager : MonoBehaviour
             }
         }
 
+        // Play win/lose sound
+        if (SoundManager.Instance != null)
+        {
+            if (playerWon)
+            {
+                SoundManager.Instance.PlayWin();
+            }
+            else
+            {
+                SoundManager.Instance.PlayLose();
+            }
+        }
+
         // Update result title
         if (resultTitleText != null)
         {
@@ -213,6 +226,12 @@ public class UIManager : MonoBehaviour
 
     void OnRetryClicked()
     {
+        // Play button click sound
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayButtonClick();
+        }
+
         if (endScreenPanel != null)
         {
             endScreenPanel.SetActive(false);
@@ -222,6 +241,12 @@ public class UIManager : MonoBehaviour
 
     void OnMenuClicked()
     {
+        // Play button click sound
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayButtonClick();
+        }
+
         UnityEngine.SceneManagement.SceneManager.LoadScene("Home");
     }
 }

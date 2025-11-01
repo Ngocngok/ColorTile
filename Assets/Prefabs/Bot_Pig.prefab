@@ -68,7 +68,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myTileState: 2
-  maxMoveSpeed: 3
+  maxMoveSpeed: 2
   acceleration: 40
   deceleration: 40
   decisionDelay: 0.3

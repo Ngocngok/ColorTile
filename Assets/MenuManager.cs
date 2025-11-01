@@ -28,6 +28,12 @@ public class MenuManager : MonoBehaviour
 
     void SelectMapSize(int size)
     {
+        // Play button click sound
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayButtonClick();
+        }
+
         // Create GameSettings if it doesn't exist
         GameSettings settings = FindObjectOfType<GameSettings>();
         if (settings == null)

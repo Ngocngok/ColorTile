@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour
 
     private float timeRemaining;
     private bool gameActive = false;
-    private bool gameStarted = false;
 
     private GameObject player;
     private GameObject[] bots;
@@ -63,7 +62,6 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         gameActive = true;
-        gameStarted = true;
         timeRemaining = gameDuration;
 
         // Reset grid

@@ -67,7 +67,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d731a324941545069fe67a81d0f12b8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxMoveSpeed: 3.5
+  maxMoveSpeed: 2.5
   acceleration: 40
   deceleration: 40
   myTileState: 1
