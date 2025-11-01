@@ -175,7 +175,7 @@ public class UIManager : MonoBehaviour
         // Update player score
         if (playerFinalScoreText != null)
         {
-            playerFinalScoreText.text = string.Format("Player: {0} tiles ({1:F1}%)", playerScore, playerPercentage);
+            playerFinalScoreText.text = string.Format("{0} tiles ({1:F1}%)", playerScore, playerPercentage);
         }
 
         // Update bot scores
@@ -183,7 +183,7 @@ public class UIManager : MonoBehaviour
         {
             int bot1Score = GameManager.Instance.GetBotScore(0);
             float bot1Percentage = (float)bot1Score / totalTiles * 100f;
-            bot1ScoreText.text = string.Format("Bot 1 (Red): {0} tiles ({1:F1}%)", bot1Score, bot1Percentage);
+            bot1ScoreText.text = string.Format("{0} tiles ({1:F1}%)", bot1Score, bot1Percentage);
             
             if (numberOfBots < 1)
                 bot1ScoreText.gameObject.SetActive(false);
@@ -195,7 +195,7 @@ public class UIManager : MonoBehaviour
             {
                 int bot2Score = GameManager.Instance.GetBotScore(1);
                 float bot2Percentage = (float)bot2Score / totalTiles * 100f;
-                bot2ScoreText.text = string.Format("Bot 2 (Yellow): {0} tiles ({1:F1}%)", bot2Score, bot2Percentage);
+                bot2ScoreText.text = string.Format("{0} tiles ({1:F1}%)", bot2Score, bot2Percentage);
             }
             else
             {
@@ -209,7 +209,7 @@ public class UIManager : MonoBehaviour
             {
                 int bot3Score = GameManager.Instance.GetBotScore(2);
                 float bot3Percentage = (float)bot3Score / totalTiles * 100f;
-                bot3ScoreText.text = string.Format("Bot 3 (Green): {0} tiles ({1:F1}%)", bot3Score, bot3Percentage);
+                bot3ScoreText.text = string.Format("{0} tiles ({1:F1}%)", bot3Score, bot3Percentage);
             }
             else
             {

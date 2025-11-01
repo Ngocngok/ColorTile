@@ -51,9 +51,17 @@ public class GameManager : MonoBehaviour
         {
             timeRemaining -= Time.deltaTime;
             
+            // Check if time ran out
             if (timeRemaining <= 0)
             {
                 timeRemaining = 0;
+                EndGame();
+                return;
+            }
+            
+            // Check if all tiles are occupied
+            if (AreAllTilesOccupied())
+            {
                 EndGame();
             }
         }
@@ -232,6 +240,16 @@ public class GameManager : MonoBehaviour
     public int GetNumberOfBots()
     {
         return numberOfBots;
+    }
+
+    bool AreAllTilesOccupied()
+    {
+        if (GridManager.Instance == null)
+            return false;
+
+        // Check if there are any empty tiles left
+        int emptyTiles = GridManager.Instance.CountTilesByState(TileState.Empty);
+        return emptyTiles == 0;
     }
 }
 
