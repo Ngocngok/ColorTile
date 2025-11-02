@@ -17,6 +17,10 @@ public class GridManager : MonoBehaviour
     public float cameraDistanceMultiplier = 1.5f;
     [Tooltip("Additional height offset for camera")]
     public float cameraHeightOffset = 5f;
+    [Tooltip("Base field of view for 16:9 aspect ratio")]
+    public float baseFOV = 60f;
+    [Tooltip("Reference aspect ratio (width/height). Default is 16:9 = 0.5625")]
+    public float referenceAspectRatio = 0.5625f; // 9/16 for portrait
 
     private Tile[,] grid;
 
@@ -78,7 +82,23 @@ public class GridManager : MonoBehaviour
         {
             // Switch to perspective camera
             mainCamera.orthographic = false;
-            mainCamera.fieldOfView = 60f; // Standard FOV
+            
+            // Calculate current aspect ratio (width/height)
+            float currentAspectRatio = (float)Screen.width / (float)Screen.height;
+            
+            // Adjust FOV based on aspect ratio
+            // For narrower screens (taller), increase FOV to show full map width
+            float adjustedFOV = baseFOV;
+            if (currentAspectRatio < referenceAspectRatio)
+            {
+                // Screen is narrower than reference, increase FOV
+                float aspectRatioDifference = referenceAspectRatio / currentAspectRatio;
+                adjustedFOV = baseFOV * aspectRatioDifference;
+                // Clamp FOV to reasonable values
+                adjustedFOV = Mathf.Clamp(adjustedFOV, baseFOV, 120f);
+            }
+            
+            mainCamera.fieldOfView = adjustedFOV;
             
             // Calculate camera distance based on map size
             float mapDiagonal = Mathf.Sqrt(gridWidth * gridWidth + gridHeight * gridHeight) * tileSize;
