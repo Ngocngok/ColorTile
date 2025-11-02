@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (!GameManager.Instance.IsGameActive())
+        if (!GameManager.Instance.IsGameActive() || GameManager.Instance.IsGamePaused())
             return;
 
         HandleMovement();

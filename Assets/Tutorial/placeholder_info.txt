@@ -1,0 +1,19 @@
+Tutorial Image Placeholders
+===========================
+
+Please replace these placeholder images with your actual tutorial images:
+
+1. tutorial_step1.png - First tutorial step
+2. tutorial_step2.png - Second tutorial step  
+3. tutorial_step3.png - Third tutorial step
+
+Recommended size: 800x800 pixels or similar square/portrait format
+Format: PNG with transparency support
+
+After adding your images:
+1. Import them into Unity
+2. Set Texture Type to "Sprite (2D and UI)"
+3. Assign them to the TutorialManager component in the Game scene:
+   - tutorialStep1
+   - tutorialStep2
+   - tutorialStep3

@@ -24,8 +24,25 @@ public class Tile : MonoBehaviour
 
     void Awake()
     {
-        tileRenderer = GetComponent<Renderer>();
-        tileMaterial = tileRenderer.material;
+        // Get renderer from child (TileModel)
+        tileRenderer = GetComponentInChildren<Renderer>();
+        
+        if (tileRenderer != null)
+        {
+            // The FBX has 2 materials, we want to modify the second one (index 1)
+            if (tileRenderer.materials.Length > 1)
+            {
+                // Create a copy of the materials array
+                Material[] materials = tileRenderer.materials;
+                // Get the second material (index 1)
+                tileMaterial = materials[1];
+            }
+            else
+            {
+                // Fallback to first material if only one exists
+                tileMaterial = tileRenderer.material;
+            }
+        }
     }
 
     public void Initialize(int xPos, int yPos)

@@ -36,7 +36,7 @@ public class BotController : MonoBehaviour
 
     void Update()
     {
-        if (!GameManager.Instance.IsGameActive())
+        if (!GameManager.Instance.IsGameActive() || GameManager.Instance.IsGamePaused())
             return;
 
         // Make decisions periodically

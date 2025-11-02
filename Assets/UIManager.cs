@@ -13,6 +13,8 @@ public class UIManager : MonoBehaviour
     public Text bot1ScoreTextHUD;
     public Text bot2ScoreTextHUD;
     public Text bot3ScoreTextHUD;
+    public Button pauseButton;
+    public GameObject pauseMenu;
 
     [Header("End Screen")]
     public GameObject endScreenPanel;
@@ -35,6 +37,8 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
+        pauseButton.onClick.AddListener(ShowPauseMenu);
     }
 
     void Start()
@@ -61,6 +65,12 @@ public class UIManager : MonoBehaviour
         {
             UpdateHUD();
         }
+    }
+
+    void ShowPauseMenu()
+    {
+        pauseMenu.SetActive(true);
+        GameManager.Instance.PauseGame();
     }
 
     void UpdateHUD()

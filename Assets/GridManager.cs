@@ -22,6 +22,9 @@ public class GridManager : MonoBehaviour
     [Tooltip("Reference aspect ratio (width/height). Default is 16:9 = 0.5625")]
     public float referenceAspectRatio = 0.5625f; // 9/16 for portrait
 
+    [Header("Decorators")]
+    public DecoratorManager decoratorManager;
+
     private Tile[,] grid;
 
     void Awake()
@@ -70,6 +73,12 @@ public class GridManager : MonoBehaviour
 
         // Center camera on grid
         CenterCamera();
+
+        // Spawn decorators around the map
+        if (decoratorManager != null)
+        {
+            //decoratorManager.SpawnDecorators(gridWidth, gridHeight, tileSize);
+        }
     }
 
     void CenterCamera()
@@ -150,6 +159,12 @@ public class GridManager : MonoBehaviour
         foreach (Tile tile in grid)
         {
             tile.SetState(TileState.Empty);
+        }
+
+        // Respawn decorators when resetting the grid
+        if (decoratorManager != null)
+        {
+            decoratorManager.SpawnDecorators(gridWidth, gridHeight, tileSize);
         }
     }
 }

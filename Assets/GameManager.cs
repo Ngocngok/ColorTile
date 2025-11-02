@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
 
     private float timeRemaining;
     private bool gameActive = false;
+    private bool gamePaused = false;
 
     private GameObject player;
     private GameObject[] bots;
@@ -47,7 +48,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (gameActive)
+        if (gameActive && !gamePaused)
         {
             timeRemaining -= Time.deltaTime;
             
@@ -250,6 +251,21 @@ public class GameManager : MonoBehaviour
         // Check if there are any empty tiles left
         int emptyTiles = GridManager.Instance.CountTilesByState(TileState.Empty);
         return emptyTiles == 0;
+    }
+
+    public void PauseGame()
+    {
+        gamePaused = true;
+    }
+
+    public void ResumeGame()
+    {
+        gamePaused = false;
+    }
+
+    public bool IsGamePaused()
+    {
+        return gamePaused;
     }
 }
 
