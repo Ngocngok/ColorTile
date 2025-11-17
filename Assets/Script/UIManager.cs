@@ -103,27 +103,22 @@ public class UIManager : MonoBehaviour
         // Update bot scores
         if (GridManager.Instance != null)
         {
-            int total = GameManager.Instance.GetTotalTiles();
-            
             if (bot1ScoreTextHUD != null)
             {
                 int bot1Score = GridManager.Instance.CountTilesByState(TileState.Bot1);
-                float bot1Percentage = (float)bot1Score / total * 100f;
-                bot1ScoreTextHUD.text = string.Format("{0:F1}%", bot1Percentage);
+                bot1ScoreTextHUD.text = bot1Score.ToString();
             }
             
             if (bot2ScoreTextHUD != null)
             {
                 int bot2Score = GridManager.Instance.CountTilesByState(TileState.Bot2);
-                float bot2Percentage = (float)bot2Score / total * 100f;
-                bot2ScoreTextHUD.text = string.Format("{0:F1}%", bot2Percentage);
+                bot2ScoreTextHUD.text = bot2Score.ToString();
             }
             
             if (bot3ScoreTextHUD != null)
             {
                 int bot3Score = GridManager.Instance.CountTilesByState(TileState.Bot3);
-                float bot3Percentage = (float)bot3Score / total * 100f;
-                bot3ScoreTextHUD.text = string.Format("{0:F1}%", bot3Percentage);
+                bot3ScoreTextHUD.text = bot3Score.ToString();
             }
         }
     }

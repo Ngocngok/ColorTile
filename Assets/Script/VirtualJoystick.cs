@@ -12,6 +12,7 @@ public class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     
     [Header("Settings")]
     public float handleRange = 50f;
+    public bool fixedPosition = true; // Keep joystick at fixed position
     
     private Vector2 inputVector;
     private Canvas canvas;
@@ -30,10 +31,10 @@ public class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         
         canvas = GetComponentInParent<Canvas>();
         
-        // Hide joystick initially
+        // Keep joystick visible if fixed position
         if (joystickBackground != null)
         {
-            joystickBackground.gameObject.SetActive(false);
+            joystickBackground.gameObject.SetActive(fixedPosition);
         }
     }
 
@@ -41,17 +42,20 @@ public class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     {
         isDragging = true;
         
-        // Show joystick at touch position
-        Vector2 localPoint;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvas.transform as RectTransform,
-            eventData.position,
-            eventData.pressEventCamera,
-            out localPoint
-        );
-        
-        joystickBackground.anchoredPosition = localPoint;
-        joystickBackground.gameObject.SetActive(true);
+        if (!fixedPosition)
+        {
+            // Show joystick at touch position (dynamic mode)
+            Vector2 localPoint;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvas.transform as RectTransform,
+                eventData.position,
+                eventData.pressEventCamera,
+                out localPoint
+            );
+            
+            joystickBackground.anchoredPosition = localPoint;
+            joystickBackground.gameObject.SetActive(true);
+        }
         
         OnDrag(eventData);
     }
@@ -78,8 +82,11 @@ public class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         inputVector = Vector2.zero;
         joystickHandle.anchoredPosition = Vector2.zero;
         
-        // Hide joystick
-        joystickBackground.gameObject.SetActive(false);
+        if (!fixedPosition)
+        {
+            // Hide joystick only in dynamic mode
+            joystickBackground.gameObject.SetActive(false);
+        }
     }
 
     public Vector2 GetInputVector()

@@ -12,7 +12,7 @@ public class BotController : MonoBehaviour
     public float decisionDelay = 0.5f;
 
     [Header("Smart Mode Settings")]
-    public float smartModeSpeed = 6f; // Faster speed in smart mode
+    public float smartModeSpeed = 4f; // Same speed as normal mode
 
     private Vector3 currentVelocity = Vector3.zero;
     private GridManager gridManager;
@@ -147,17 +147,34 @@ public class BotController : MonoBehaviour
         int currentX = Mathf.RoundToInt(transform.position.x / gridManager.tileSize);
         int currentZ = Mathf.RoundToInt(transform.position.z / gridManager.tileSize);
 
-        // If we don't have a target or reached it, find a new one
-        if (targetTile == null || (targetTile.x == currentX && targetTile.y == currentZ))
+        // Check if we need a new target
+        bool needNewTarget = false;
+        
+        if (targetTile == null)
+        {
+            needNewTarget = true;
+        }
+        else if (targetTile.x == currentX && targetTile.y == currentZ)
+        {
+            // We're on the target tile
+            if (targetTile.state != TileState.Empty)
+            {
+                // Target was claimed (by us or someone else), find new target
+                Debug.Log($"[{myTileState}] Smart Mode: Target ({targetTile.x}, {targetTile.y}) was claimed. Finding new target.");
+                needNewTarget = true;
+            }
+        }
+        
+        if (needNewTarget)
         {
             targetTile = FindNearestReachableTile(currentX, currentZ);
             if (targetTile != null)
             {
-                Debug.Log($"[{myTileState}] Smart Mode: New target found at ({targetTile.x}, {targetTile.y})");
+                Debug.Log($"[{myTileState}] Smart Mode: New target found at ({targetTile.x}, {targetTile.y}), distance: {Mathf.Abs(targetTile.x - currentX) + Mathf.Abs(targetTile.y - currentZ)}");
             }
             else
             {
-                Debug.Log($"[{myTileState}] Smart Mode: No reachable tiles found!");
+                Debug.Log($"[{myTileState}] Smart Mode: No reachable empty tiles found!");
             }
         }
 
@@ -168,6 +185,13 @@ public class BotController : MonoBehaviour
             Vector3 direction = (targetPos - transform.position).normalized;
             direction.y = 0; // Keep movement horizontal
             targetDirection = direction;
+            
+            // Check if target is still empty
+            if (targetTile.state != TileState.Empty)
+            {
+                // Target was claimed while moving, invalidate it
+                targetTile = null;
+            }
         }
         else
         {
@@ -178,7 +202,7 @@ public class BotController : MonoBehaviour
 
     Tile FindNearestReachableTile(int startX, int startZ)
     {
-        // Find all empty tiles and own unclaimed tiles
+        // Find all EMPTY tiles only (not own tiles - we want to expand territory)
         List<Tile> candidateTiles = new List<Tile>();
         
         for (int x = 0; x < gridManager.gridWidth; x++)
@@ -186,11 +210,18 @@ public class BotController : MonoBehaviour
             for (int y = 0; y < gridManager.gridHeight; y++)
             {
                 Tile tile = gridManager.GetTile(x, y);
-                if (tile != null && (tile.state == TileState.Empty || tile.state == myTileState))
+                // Only target empty tiles in smart mode
+                if (tile != null && tile.state == TileState.Empty)
                 {
                     candidateTiles.Add(tile);
                 }
             }
+        }
+
+        if (candidateTiles.Count == 0)
+        {
+            Debug.Log($"[{myTileState}] Smart Mode: No empty tiles left on the map!");
+            return null;
         }
 
         // Sort by distance and check reachability
@@ -207,6 +238,7 @@ public class BotController : MonoBehaviour
             }
         }
 
+        Debug.Log($"[{myTileState}] Smart Mode: Found {candidateTiles.Count} empty tiles but none are reachable!");
         return null;
     }
 
@@ -343,7 +375,13 @@ public class BotController : MonoBehaviour
             {
                 if (tile.CanBeClaimedBy(myTileState))
                 {
+                    bool wasEmpty = tile.state == TileState.Empty;
                     tile.SetState(myTileState);
+                    
+                    if (wasEmpty && isSmartMode)
+                    {
+                        Debug.Log($"[{myTileState}] Smart Mode: Claimed tile at ({gridX}, {gridZ})");
+                    }
                 }
                 currentTile = tile;
             }

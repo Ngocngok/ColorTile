@@ -172,6 +172,9 @@ public class GridManager : MonoBehaviour
     // Check if the player is trapped (cannot expand their territory)
     public bool IsPlayerTrapped()
     {
+        int playerTileCount = 0;
+        int tilesWithEmptyNeighbors = 0;
+        
         // Find all player tiles
         for (int x = 0; x < gridWidth; x++)
         {
@@ -180,6 +183,9 @@ public class GridManager : MonoBehaviour
                 Tile tile = grid[x, y];
                 if (tile.state == TileState.Player)
                 {
+                    playerTileCount++;
+                    bool hasEmptyNeighbor = false;
+                    
                     // Check all 4 adjacent tiles (up, down, left, right)
                     int[] dx = { 0, 0, -1, 1 };
                     int[] dy = { -1, 1, 0, 0 };
@@ -189,21 +195,29 @@ public class GridManager : MonoBehaviour
                         int newX = x + dx[i];
                         int newY = y + dy[i];
 
+                        // Only check valid positions (inside grid bounds)
                         if (IsValidPosition(newX, newY))
                         {
                             Tile adjacentTile = grid[newX, newY];
-                            // If there's an empty tile or player's own tile adjacent, player is NOT trapped
-                            if (adjacentTile.state == TileState.Empty || adjacentTile.state == TileState.Player)
+                            // If there's an empty tile adjacent, player can still expand - NOT trapped
+                            if (adjacentTile.state == TileState.Empty)
                             {
+                                hasEmptyNeighbor = true;
+                                tilesWithEmptyNeighbors++;
+                                Debug.Log($"Player NOT trapped: Found empty tile at ({newX}, {newY}) adjacent to player tile at ({x}, {y})");
                                 return false;
                             }
                         }
+                        // Note: Out-of-bounds positions are treated as obstacles (can't expand there)
+                        // Player's own tiles don't count as expansion opportunities
                     }
                 }
             }
         }
 
-        // If we get here, all player tiles are surrounded by bot tiles
+        // If we get here, all player tiles have no adjacent empty tiles
+        // Player cannot expand their territory - they are trapped
+        Debug.Log($"Player IS TRAPPED! Total player tiles: {playerTileCount}, Tiles with empty neighbors: {tilesWithEmptyNeighbors}");
         return true;
     }
 

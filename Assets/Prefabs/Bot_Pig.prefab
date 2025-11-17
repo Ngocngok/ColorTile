@@ -72,6 +72,7 @@ MonoBehaviour:
   acceleration: 40
   deceleration: 40
   decisionDelay: 0.3
+  smartModeSpeed: 2
 --- !u!1001 &6378485508582282884
 PrefabInstance:
   m_ObjectHideFlags: 0

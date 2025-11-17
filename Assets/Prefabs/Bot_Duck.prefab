@@ -20,6 +20,10 @@ PrefabInstance:
       propertyPath: maxMoveSpeed
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5105482071810591300, guid: fd4c38637bbac3749950cebf26a922eb, type: 3}
+      propertyPath: smartModeSpeed
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6213141757230732553, guid: fd4c38637bbac3749950cebf26a922eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
