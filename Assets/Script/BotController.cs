@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class BotController : MonoBehaviour
 {
@@ -10,11 +11,16 @@ public class BotController : MonoBehaviour
     public float deceleration = 25f;
     public float decisionDelay = 0.5f;
 
+    [Header("Smart Mode Settings")]
+    public float smartModeSpeed = 6f; // Faster speed in smart mode
+
     private Vector3 currentVelocity = Vector3.zero;
     private GridManager gridManager;
     private Tile currentTile;
     private float nextDecisionTime;
     private Vector3 targetDirection;
+    private bool isSmartMode = false;
+    private Tile targetTile = null;
 
     void Start()
     {
@@ -39,10 +45,24 @@ public class BotController : MonoBehaviour
         if (!GameManager.Instance.IsGameActive() || GameManager.Instance.IsGamePaused())
             return;
 
+        // Check if player is trapped to enable smart mode
+        if (!isSmartMode && gridManager.IsPlayerTrapped())
+        {
+            isSmartMode = true;
+            targetTile = null; // Reset target to find new one
+        }
+
         // Make decisions periodically
         if (Time.time >= nextDecisionTime)
         {
-            MakeDecision();
+            if (isSmartMode)
+            {
+                MakeSmartDecision();
+            }
+            else
+            {
+                MakeDecision();
+            }
             nextDecisionTime = Time.time + decisionDelay;
         }
 
@@ -121,10 +141,122 @@ public class BotController : MonoBehaviour
         }
     }
 
+    void MakeSmartDecision()
+    {
+        int currentX = Mathf.RoundToInt(transform.position.x / gridManager.tileSize);
+        int currentZ = Mathf.RoundToInt(transform.position.z / gridManager.tileSize);
+
+        // If we don't have a target or reached it, find a new one
+        if (targetTile == null || (targetTile.x == currentX && targetTile.y == currentZ))
+        {
+            targetTile = FindNearestReachableTile(currentX, currentZ);
+        }
+
+        // If we have a target, move towards it
+        if (targetTile != null)
+        {
+            Vector3 targetPos = new Vector3(targetTile.x * gridManager.tileSize, transform.position.y, targetTile.y * gridManager.tileSize);
+            Vector3 direction = (targetPos - transform.position).normalized;
+            direction.y = 0; // Keep movement horizontal
+            targetDirection = direction;
+        }
+        else
+        {
+            // No reachable tiles, stop
+            targetDirection = Vector3.zero;
+        }
+    }
+
+    Tile FindNearestReachableTile(int startX, int startZ)
+    {
+        // Find all empty tiles and own unclaimed tiles
+        List<Tile> candidateTiles = new List<Tile>();
+        
+        for (int x = 0; x < gridManager.gridWidth; x++)
+        {
+            for (int y = 0; y < gridManager.gridHeight; y++)
+            {
+                Tile tile = gridManager.GetTile(x, y);
+                if (tile != null && (tile.state == TileState.Empty || tile.state == myTileState))
+                {
+                    candidateTiles.Add(tile);
+                }
+            }
+        }
+
+        // Sort by distance and check reachability
+        candidateTiles = candidateTiles.OrderBy(t => 
+            Mathf.Abs(t.x - startX) + Mathf.Abs(t.y - startZ)
+        ).ToList();
+
+        // Find the nearest reachable tile
+        foreach (Tile tile in candidateTiles)
+        {
+            if (IsReachable(startX, startZ, tile.x, tile.y))
+            {
+                return tile;
+            }
+        }
+
+        return null;
+    }
+
+    bool IsReachable(int startX, int startZ, int targetX, int targetZ)
+    {
+        // Simple BFS pathfinding to check if target is reachable
+        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+        HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+
+        queue.Enqueue(new Vector2Int(startX, startZ));
+        visited.Add(new Vector2Int(startX, startZ));
+
+        int[] dx = { 0, 0, -1, 1 };
+        int[] dy = { -1, 1, 0, 0 };
+
+        int maxIterations = 1000; // Prevent infinite loops
+        int iterations = 0;
+
+        while (queue.Count > 0 && iterations < maxIterations)
+        {
+            iterations++;
+            Vector2Int current = queue.Dequeue();
+
+            // Check if we reached the target
+            if (current.x == targetX && current.y == targetZ)
+            {
+                return true;
+            }
+
+            // Explore neighbors
+            for (int i = 0; i < 4; i++)
+            {
+                int newX = current.x + dx[i];
+                int newY = current.y + dy[i];
+                Vector2Int neighbor = new Vector2Int(newX, newY);
+
+                if (!visited.Contains(neighbor) && gridManager.IsValidPosition(newX, newY))
+                {
+                    Tile tile = gridManager.GetTile(newX, newY);
+                    // Can walk on empty tiles or own tiles
+                    if (tile != null && tile.CanWalkOn(myTileState))
+                    {
+                        visited.Add(neighbor);
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     void HandleMovement()
     {
+        // Use faster speed in smart mode
+        float currentMaxSpeed = isSmartMode ? smartModeSpeed : maxMoveSpeed;
+        
         // Calculate target velocity
-        Vector3 targetVelocity = targetDirection * maxMoveSpeed;
+        Vector3 targetVelocity = targetDirection * currentMaxSpeed;
 
         // Apply acceleration or deceleration
         if (targetDirection.magnitude > 0.1f)
@@ -215,6 +347,8 @@ public class BotController : MonoBehaviour
         currentVelocity = Vector3.zero;
         targetDirection = Vector3.zero;
         currentTile = null;
+        isSmartMode = false;
+        targetTile = null;
         CheckAndClaimTile();
         nextDecisionTime = Time.time + decisionDelay;
     }

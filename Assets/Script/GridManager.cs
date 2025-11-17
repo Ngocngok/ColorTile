@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour
 {
@@ -166,6 +167,58 @@ public class GridManager : MonoBehaviour
         {
             decoratorManager.SpawnDecorators(gridWidth, gridHeight, tileSize);
         }
+    }
+
+    // Check if the player is trapped (cannot expand their territory)
+    public bool IsPlayerTrapped()
+    {
+        // Find all player tiles
+        for (int x = 0; x < gridWidth; x++)
+        {
+            for (int y = 0; y < gridHeight; y++)
+            {
+                Tile tile = grid[x, y];
+                if (tile.state == TileState.Player)
+                {
+                    // Check all 4 adjacent tiles (up, down, left, right)
+                    int[] dx = { 0, 0, -1, 1 };
+                    int[] dy = { -1, 1, 0, 0 };
+
+                    for (int i = 0; i < 4; i++)
+                    {
+                        int newX = x + dx[i];
+                        int newY = y + dy[i];
+
+                        if (IsValidPosition(newX, newY))
+                        {
+                            Tile adjacentTile = grid[newX, newY];
+                            // If there's an empty tile or player's own tile adjacent, player is NOT trapped
+                            if (adjacentTile.state == TileState.Empty || adjacentTile.state == TileState.Player)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // If we get here, all player tiles are surrounded by bot tiles
+        return true;
+    }
+
+    // Get all tiles of a specific state
+    public List<Tile> GetTilesByState(TileState state)
+    {
+        List<Tile> tiles = new List<Tile>();
+        foreach (Tile tile in grid)
+        {
+            if (tile.state == state)
+            {
+                tiles.Add(tile);
+            }
+        }
+        return tiles;
     }
 }
 
