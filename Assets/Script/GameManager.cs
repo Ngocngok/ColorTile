@@ -42,8 +42,8 @@ public class GameManager : MonoBehaviour
         // Load high score
         highScore = PlayerPrefs.GetInt("HighScore", 0);
         
-        // Wait for grid to be ready
-        Invoke("StartGame", 0.5f);
+        // Wait for grid to be ready, then initialize game
+        Invoke("InitializeGame", 0.5f);
     }
 
     void Update()
@@ -68,17 +68,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void StartGame()
+    // Initialize game: spawn characters and pause
+    void InitializeGame()
     {
-        gameActive = true;
-        timeRemaining = gameDuration;
-
-        // Play game background music
-        if (SoundManager.Instance != null)
-        {
-            SoundManager.Instance.PlayBgGame();
-        }
-
         // Reset grid
         if (GridManager.Instance != null)
         {
@@ -109,6 +101,39 @@ public class GameManager : MonoBehaviour
                     bot.GetComponent<BotController>().ResetPosition();
                 }
             }
+        }
+
+        // Pause the game initially
+        PauseGame();
+
+        // Tutorial will be shown by TutorialManager if needed
+        // After tutorial (or if skipped), TutorialManager or this will trigger countdown
+    }
+
+    // Called after tutorial ends or immediately if no tutorial
+    public void StartGameCountdown()
+    {
+        if (CountdownManager.Instance != null)
+        {
+            CountdownManager.Instance.StartCountdown();
+        }
+        else
+        {
+            // Fallback: start game immediately if no countdown manager
+            StartGame();
+        }
+    }
+
+    // Actually start the game (called after countdown)
+    public void StartGame()
+    {
+        gameActive = true;
+        timeRemaining = gameDuration;
+
+        // Play game background music
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayBgGame();
         }
 
         UIManager.Instance?.UpdateGameState(true);
@@ -229,7 +254,10 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
-        StartGame();
+        InitializeGame();
+        
+        // Start countdown after a brief delay
+        Invoke("StartGameCountdown", 0.1f);
     }
 
     public void LoadMainMenu()

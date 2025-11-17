@@ -35,16 +35,6 @@ public class TutorialManager : MonoBehaviour
 
     void Start()
     {
-        // Check if tutorial should be shown
-        if (ShouldShowTutorial())
-        {
-            ShowTutorial();
-        }
-        else
-        {
-            HideTutorial();
-        }
-
         // Setup button listeners
         if (nextButton != null)
         {
@@ -54,6 +44,21 @@ public class TutorialManager : MonoBehaviour
         if (okButton != null)
         {
             okButton.onClick.AddListener(OnOkClicked);
+        }
+
+        // Check if tutorial should be shown
+        if (ShouldShowTutorial())
+        {
+            ShowTutorial();
+        }
+        else
+        {
+            HideTutorial();
+            // No tutorial, start countdown immediately
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.StartGameCountdown();
+            }
         }
     }
 
@@ -175,10 +180,10 @@ public class TutorialManager : MonoBehaviour
         // Hide tutorial
         HideTutorial();
 
-        // Resume game
+        // Start countdown instead of resuming immediately
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.ResumeGame();
+            GameManager.Instance.StartGameCountdown();
         }
     }
 
