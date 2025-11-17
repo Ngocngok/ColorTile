@@ -128,6 +128,7 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         gameActive = true;
+        gamePaused = false; // Unpause the game
         timeRemaining = gameDuration;
 
         // Play game background music

@@ -50,6 +50,7 @@ public class BotController : MonoBehaviour
         {
             isSmartMode = true;
             targetTile = null; // Reset target to find new one
+            Debug.Log($"[{myTileState}] SMART MODE ACTIVATED! Player is trapped. Switching to aggressive pathfinding with increased speed ({smartModeSpeed}f).");
         }
 
         // Make decisions periodically
@@ -150,6 +151,14 @@ public class BotController : MonoBehaviour
         if (targetTile == null || (targetTile.x == currentX && targetTile.y == currentZ))
         {
             targetTile = FindNearestReachableTile(currentX, currentZ);
+            if (targetTile != null)
+            {
+                Debug.Log($"[{myTileState}] Smart Mode: New target found at ({targetTile.x}, {targetTile.y})");
+            }
+            else
+            {
+                Debug.Log($"[{myTileState}] Smart Mode: No reachable tiles found!");
+            }
         }
 
         // If we have a target, move towards it

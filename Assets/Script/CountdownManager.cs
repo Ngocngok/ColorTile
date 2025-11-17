@@ -80,10 +80,10 @@ public class CountdownManager : MonoBehaviour
 
         countdownActive = false;
 
-        // Resume the game
+        // Start the game (this sets gameActive to true and resumes)
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.ResumeGame();
+            GameManager.Instance.StartGame();
         }
     }
 
