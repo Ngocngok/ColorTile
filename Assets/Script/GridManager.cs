@@ -24,7 +24,14 @@ public class GridManager : MonoBehaviour
     public float referenceAspectRatio = 0.5625f; // 9/16 for portrait
 
     [Header("Decorators")]
-    public DecoratorManager decoratorManager;
+    //public DecoratorManager decoratorManager;
+    
+    [Header("Area Prefabs")]
+    public GameObject area1Prefab; // 10x10
+    public GameObject area2Prefab; // 15x15
+    public GameObject area3Prefab; // 20x20
+
+    private GameObject currentArea;
 
     private Tile[,] grid;
 
@@ -76,9 +83,39 @@ public class GridManager : MonoBehaviour
         CenterCamera();
 
         // Spawn decorators around the map
-        if (decoratorManager != null)
+        /*if (decoratorManager != null)
         {
             //decoratorManager.SpawnDecorators(gridWidth, gridHeight, tileSize);
+        }*/
+
+        SpawnArea();
+    }
+
+    void SpawnArea()
+    {
+        if (currentArea != null)
+        {
+            Destroy(currentArea);
+        }
+
+        GameObject prefabToSpawn = null;
+
+        if (gridWidth == 10)
+        {
+            prefabToSpawn = area1Prefab;
+        }
+        else if (gridWidth == 15)
+        {
+            prefabToSpawn = area2Prefab;
+        }
+        else if (gridWidth == 20)
+        {
+            prefabToSpawn = area3Prefab;
+        }
+
+        if (prefabToSpawn != null)
+        {
+            currentArea = Instantiate(prefabToSpawn);
         }
     }
 
@@ -163,9 +200,15 @@ public class GridManager : MonoBehaviour
         }
 
         // Respawn decorators when resetting the grid
-        if (decoratorManager != null)
+        /*if (decoratorManager != null)
         {
             decoratorManager.SpawnDecorators(gridWidth, gridHeight, tileSize);
+        }*/
+        
+        // Ensure area is spawned if missing (e.g. if destroyed)
+        if (currentArea == null)
+        {
+            SpawnArea();
         }
     }
 
