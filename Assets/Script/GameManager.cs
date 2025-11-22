@@ -39,9 +39,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // Load high score
-        highScore = PlayerPrefs.GetInt("HighScore", 0);
-        
         // Wait for grid to be ready, then initialize game
         Invoke("InitializeGame", 0.5f);
     }
@@ -76,6 +73,10 @@ public class GameManager : MonoBehaviour
         {
             GridManager.Instance.ResetGrid();
         }
+
+        // Load high score for the current map size
+        string key = GetHighScoreKey();
+        highScore = PlayerPrefs.GetInt(key, 0);
 
         // Spawn player
         if (player == null)
@@ -257,9 +258,25 @@ public class GameManager : MonoBehaviour
         if (playerScore > highScore)
         {
             highScore = playerScore;
-            PlayerPrefs.SetInt("HighScore", highScore);
+            string key = GetHighScoreKey();
+            PlayerPrefs.SetInt(key, highScore);
             PlayerPrefs.Save();
         }
+    }
+
+    private string GetHighScoreKey()
+    {
+        int size = 20; // Default
+        if (GridManager.Instance != null)
+        {
+            size = GridManager.Instance.gridWidth;
+        }
+        else if (GameSettings.Instance != null)
+        {
+            size = GameSettings.Instance.GetMapSize();
+        }
+        
+        return $"HighScore_{size}";
     }
 
     public bool IsGameActive()

@@ -225,7 +225,17 @@ public class UIManager : MonoBehaviour
         // Update high score
         if (highScoreText != null)
         {
-            highScoreText.text = "Best Score: " + GameManager.Instance.GetHighScore() + " tiles";
+            int mapSize = 20;
+            if (GridManager.Instance != null)
+            {
+                mapSize = GridManager.Instance.gridWidth;
+            }
+            else if (GameSettings.Instance != null)
+            {
+                mapSize = GameSettings.Instance.GetMapSize();
+            }
+            
+            highScoreText.text = $"Best Score {mapSize}x{mapSize}: " + GameManager.Instance.GetHighScore() + " tiles";
         }
     }
 
