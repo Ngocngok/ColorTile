@@ -18,13 +18,6 @@ public class PlayerController : MonoBehaviour
         gridManager = GridManager.Instance;
         joystick = VirtualJoystick.Instance;
         
-        // Spawn at a random position
-        int startX = Random.Range(0, gridManager.gridWidth);
-        int startY = Random.Range(0, gridManager.gridHeight);
-        
-        Vector3 spawnPos = new Vector3(startX * gridManager.tileSize, 0.5f, startY * gridManager.tileSize);
-        transform.position = spawnPos;
-        
         CheckAndClaimTile();
     }
 
@@ -138,13 +131,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void ResetPosition()
+    public void ResetPosition(Vector3 position)
     {
-        int startX = Random.Range(0, gridManager.gridWidth);
-        int startY = Random.Range(0, gridManager.gridHeight);
-        
-        Vector3 spawnPos = new Vector3(startX * gridManager.tileSize, 0.5f, startY * gridManager.tileSize);
-        transform.position = spawnPos;
+        transform.position = position;
         
         currentVelocity = Vector3.zero;
         currentTile = null;

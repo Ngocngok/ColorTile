@@ -26,18 +26,8 @@ public class BotController : MonoBehaviour
     {
         gridManager = GridManager.Instance;
         
-        SpawnAtRandomPosition();
         CheckAndClaimTile();
         nextDecisionTime = Time.time + decisionDelay;
-    }
-
-    void SpawnAtRandomPosition()
-    {
-        int startX = Random.Range(0, gridManager.gridWidth);
-        int startY = Random.Range(0, gridManager.gridHeight);
-        
-        Vector3 spawnPos = new Vector3(startX * gridManager.tileSize, 0.5f, startY * gridManager.tileSize);
-        transform.position = spawnPos;
     }
 
     void Update()
@@ -388,9 +378,9 @@ public class BotController : MonoBehaviour
         }
     }
 
-    public void ResetPosition()
+    public void ResetPosition(Vector3 position)
     {
-        SpawnAtRandomPosition();
+        transform.position = position;
         currentVelocity = Vector3.zero;
         targetDirection = Vector3.zero;
         currentTile = null;

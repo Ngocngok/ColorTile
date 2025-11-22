@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            player.GetComponent<PlayerController>().ResetPosition();
+            player.GetComponent<PlayerController>().ResetPosition(GetSpawnPosition(0));
         }
 
         // Spawn bots
@@ -94,11 +94,11 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            foreach (GameObject bot in bots)
+            for (int i = 0; i < bots.Length; i++)
             {
-                if (bot != null)
+                if (bots[i] != null)
                 {
-                    bot.GetComponent<BotController>().ResetPosition();
+                    bots[i].GetComponent<BotController>().ResetPosition(GetSpawnPosition(i + 1));
                 }
             }
         }
@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour
 
     void SpawnPlayer()
     {
-        Vector3 spawnPos = new Vector3(0, 0.5f, 0);
+        Vector3 spawnPos = GetSpawnPosition(0);
         player = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
     }
 
@@ -168,7 +168,7 @@ public class GameManager : MonoBehaviour
         {
             if (botPrefabs[i] == null) continue;
             
-            Vector3 spawnPos = new Vector3(0, 0.5f, 0);
+            Vector3 spawnPos = GetSpawnPosition(i + 1);
             bots[i] = Instantiate(botPrefabs[i], spawnPos, Quaternion.identity);
             
             BotController botController = bots[i].GetComponent<BotController>();
@@ -177,6 +177,56 @@ public class GameManager : MonoBehaviour
                 botController.myTileState = botStates[i];
             }
         }
+    }
+
+    Vector3 GetSpawnPosition(int index)
+    {
+        if (GridManager.Instance == null) return new Vector3(0, 0.5f, 0);
+
+        int width = GridManager.Instance.gridWidth;
+        int height = GridManager.Instance.gridHeight;
+        float tileSize = GridManager.Instance.tileSize;
+
+        int x = 0;
+        int y = 0;
+
+        // Define spawn points (inset by 2 to avoid corners/walls)
+        // Ensure inset is not too large for small grids
+        int inset = 2;
+        if (width < 6 || height < 6)
+        {
+            inset = 1;
+        }
+        
+        switch (index)
+        {
+            case 0: // Player: Bottom-Left
+                x = inset;
+                y = inset;
+                break;
+            case 1: // Bot 1: Top-Right
+                x = width - 1 - inset;
+                y = height - 1 - inset;
+                break;
+            case 2: // Bot 2: Top-Left
+                x = inset;
+                y = height - 1 - inset;
+                break;
+            case 3: // Bot 3: Bottom-Right
+                x = width - 1 - inset;
+                y = inset;
+                break;
+            default:
+                x = width / 2;
+                y = height / 2;
+                break;
+        }
+        
+        // Clamp to grid bounds
+        x = Mathf.Clamp(x, 0, width - 1);
+        y = Mathf.Clamp(y, 0, height - 1);
+
+        return new Vector3(x * tileSize, 0.5f, y * tileSize);
     }
 
     void EndGame()
